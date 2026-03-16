@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sonic Discovery — Trial</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0e0e0e;
+    --white: #f7f5f0;
+    --warm-gray: #9e9b94;
+    --border: #d4d0c8;
+    --accent: #2d5a3d;
+    --accent-light: #e8f0eb;
+    --danger: #8b2020;
+    --card-bg: #ffffff;
+    --page-bg: #f7f5f0;
+    --tag-bg: #ede9e1;
+    --tier1: #1a3a28;
+    --tier2: #2d5a3d;
+    --tier3: #4a8c5c;
+    --tier3-bg: #e8f5ee;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--page-bg);
+    color: var(--black);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .app {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  .wordmark {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    letter-spacing: -0.5px;
+    color: var(--black);
+    margin-bottom: 4px;
+  }
+  .wordmark em { font-style: italic; color: var(--accent); }
+  .tagline {
+    font-size: 13px;
+    color: var(--warm-gray);
+    font-family: 'DM Mono', monospace;
+    margin-bottom: 48px;
+    letter-spacing: 0.02em;
+  }
+
+  .phase { display: none; }
+  .phase.active { display: block; }
+
+  .phase-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    font-weight: 400;
+    line-height: 1.25;
+    margin-bottom: 12px;
+    letter-spacing: -0.3px;
+  }
+  h2 em { font-style: italic; color: var(--accent); }
+
+  .lede {
+    color: #555;
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 32px;
+    max-width: 580px;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .card-title {
+    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: var(--black);
+  }
+
+  .step-list {
+    list-style: none;
+    counter-reset: steps;
+  }
+  .step-list li {
+    counter-increment: steps;
+    display: flex;
+    gap: 14px;
+    margin-bottom: 14px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #444;
+  }
+  .step-list li::before {
+    content: counter(steps);
+    min-width: 24px;
+    height: 24px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+
+  .mono-field {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    background: #f0ede6;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    color: var(--black);
+    word-break: break-all;
+    margin: 8px 0;
+  }
+
+  label {
+    display: block;
+    font-size: 13px;
+    color: var(--warm-gray);
+    margin-bottom: 6px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  input[type="text"], textarea {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    background: white;
+    color: var(--black);
+    margin-bottom: 16px;
+    transition: border-color 0.15s;
+    outline: none;
+  }
+  input[type="text"]:focus, textarea:focus {
+    border-color: var(--accent);
+  }
+  textarea { resize: vertical; min-height: 80px; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+  .btn-primary:hover { background: #245030; }
+  .btn-secondary {
+    background: white;
+    color: var(--black);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { background: var(--tag-bg); }
+  .btn-spotify {
+    background: #1DB954;
+    color: white;
+  }
+  .btn-spotify:hover { background: #17a047; }
+
+  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+
+  .info-box {
+    background: var(--accent-light);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #2a4a35;
+    margin: 16px 0;
+    line-height: 1.6;
+  }
+
+  .warn-box {
+    background: #fff8e6;
+    border-left: 3px solid #c8960a;
+    border-radius: 0 8px 8px 0;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #5a4000;
+    margin: 16px 0;
+    line-height: 1.6;
+  }
+
+  .artist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  .artist-chip {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: border-color 0.15s;
+  }
+  .artist-chip:hover { border-color: var(--accent); }
+  .artist-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .artist-name { font-weight: 500; font-size: 13px; }
+  .artist-genre { font-size: 11px; color: var(--warm-gray); }
+
+  .match-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .match-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+  }
+  .match-card.tier1::before { background: var(--tier1); }
+  .match-card.tier2::before { background: var(--tier2); }
+  .match-card.tier3::before { background: var(--tier3); }
+
+  .match-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; gap: 12px; }
+  .match-artist { font-family: 'DM Serif Display', serif; font-size: 20px; font-weight: 400; }
+  .match-meta { font-size: 12px; color: var(--warm-gray); margin-top: 2px; }
+  .tier-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+  .tier1 .tier-badge { background: #e8f0eb; color: var(--tier1); }
+  .tier2 .tier-badge { background: #e8f5ee; color: var(--tier2); }
+  .tier3 .tier-badge { background: #f0faf4; color: var(--tier3); }
+
+  .match-explanation {
+    font-size: 13px;
+    color: #444;
+    line-height: 1.7;
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+    margin-top: 8px;
+  }
+
+  .primitive-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 10px 0;
+  }
+  .tag {
+    background: var(--tag-bg);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    color: #555;
+  }
+  .tag.match { background: var(--tier3-bg); color: var(--tier1); }
+
+  .progress-bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-bottom: 32px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .thinking {
+    background: var(--accent-light);
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 13px;
+    color: #2a4a35;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .thinking-spinner {
+    width: 16px; height: 16px;
+    border: 2px solid #4a8c5c;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+
+  .section-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 32px 0;
+  }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 520px) { .two-col { grid-template-columns: 1fr; } }
+
+  .feedback-box {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .feedback-btn {
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: white;
+    color: #555;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .feedback-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .feedback-btn.selected-yes { background: var(--tier3-bg); border-color: var(--accent); color: var(--tier1); }
+  .feedback-btn.selected-no { background: #fdeaea; border-color: #c0392b; color: #8b2020; }
+
+  .score-display {
+    font-family: 'DM Mono', monospace;
+    font-size: 36px;
+    font-weight: 500;
+    color: var(--accent);
+    margin: 8px 0;
+  }
+  .score-label { font-size: 13px; color: var(--warm-gray); }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="wordmark">Sonic<em>.</em></div>
+  <div class="tagline">discovery trial — personal use case</div>
+
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress" style="width: 0%"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       PHASE 1: SPOTIFY SETUP
+  ════════════════════════════════════════════════ -->
+  <div class="phase active" id="phase-setup">
+    <div class="phase-label">Phase 01 — Setup</div>
+    <h2>Connect your <em>Spotify</em> data</h2>
+    <p class="lede">This trial uses your real listening history. You'll need a free Spotify Developer app — takes about 3 minutes. No client secret required.</p>
+
+    <div class="card">
+      <div class="card-title">Create your Spotify app</div>
+      <ol class="step-list">
+        <li>Go to <strong>developer.spotify.com/dashboard</strong> and log in</li>
+        <li>Click <strong>Create App</strong>. Name it anything — "Sonic Trial" works</li>
+        <li>Set the Redirect URI to exactly: <div class="mono-field" id="redirect-uri-display">loading...</div></li>
+        <li>Check <strong>Web API</strong> under APIs used, then save</li>
+        <li>Copy your <strong>Client ID</strong> from the app dashboard (no secret needed)</li>
+      </ol>
+    </div>
+
+    <div class="info-box">
+      Using PKCE — Spotify's browser-native OAuth. No client secret or server required. After you authorize, Spotify redirects back to this exact page and the token is captured automatically.
+    </div>
+
+    <div class="card">
+      <div class="card-title">Enter your credentials</div>
+      <label>Spotify Client ID</label>
+      <input type="text" id="client-id" placeholder="e.g. 1a2b3c4d5e6f7g8h9i0j..." />
+      <label>Anthropic API Key</label>
+      <input type="password" id="anthropic-key" placeholder="sk-ant-api03-..." />
+    </div>
+
+    <div id="auth-error" class="hidden" style="margin-top:12px; font-size:13px; color: var(--danger);"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-spotify" data-action="startSpotifyAuth">Authorize Spotify →</button>
+      <button class="btn btn-secondary" data-action="skipToManual">Enter artists manually instead</button>
+    </div>
+  </div>
+
+  <div class="phase" id="phase-callback">
+    <div class="phase-label">Phase 01b — Connecting</div>
+    <h2>Completing <em>authorization</em>...</h2>
+    <div class="thinking">
+      <div class="thinking-spinner"></div>
+      <span>Exchanging token with Spotify...</span>
+    </div>
+    <div id="auth-error-2" class="hidden" style="margin-top:12px; font-size:13px; color: var(--danger);"></div>
+  </div>
+
+  <div class="phase" id="phase-manual">
+    <div class="phase-label">Phase 01 — Manual Input</div>
+    <h2>Your <em>listening</em> universe</h2>
+    <p class="lede">Enter your artists directly, or paste a track list from a playlist export.</p>
+
+    <div style="display:flex;gap:0;margin-bottom:20px;border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+      <button class="tab-btn active" id="tab-artists" data-action="switchTab" data-tab="artists" style="flex:1;padding:10px;border:none;background:white;cursor:pointer;font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;border-right:1px solid var(--border);">Artist list</button>
+      <button class="tab-btn" id="tab-tracks" data-action="switchTab" data-tab="tracks" style="flex:1;padding:10px;border:none;background:var(--tag-bg);cursor:pointer;font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;color:var(--warm-gray);">Paste track list</button>
+    </div>
+
+    <div id="panel-artists">
+      <div class="card">
+        <div class="card-title">Core artists (aim for 10–20)</div>
+        <label>One artist per line</label>
+        <textarea id="manual-artists" rows="10" placeholder="Dijon&#10;Mk.gee&#10;MJ Lenderman&#10;DERBY&#10;Khruangbin&#10;..."></textarea>
+      </div>
+    </div>
+
+    <div id="panel-tracks" style="display:none;">
+      <div class="card">
+        <div class="card-title">Paste track list</div>
+        <p style="font-size:13px;color:#555;margin-bottom:12px;line-height:1.6;">Paste tab-separated or plain text with artist and track info. The system will extract the artists automatically.</p>
+        <textarea id="track-list" rows="14" placeholder="Paste your playlist export here — any format works. Artist names will be extracted."></textarea>
+      </div>
+    </div>
+
+    <div id="manual-api-key-section" class="card" style="margin-bottom:20px;">
+      <div class="card-title">Anthropic API Key</div>
+      <label>Required to run the fingerprint engine</label>
+      <input type="password" id="anthropic-key-manual" placeholder="sk-ant-api03-..." />
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" data-action="processInput">Build my fingerprint →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       PHASE 3: FINGERPRINT BUILDING
+  ════════════════════════════════════════════════ -->
+  <div class="phase" id="phase-fingerprint">
+    <div class="phase-label">Phase 02 — Fingerprinting</div>
+    <h2>Annotating your <em>taste profile</em></h2>
+    <p class="lede">Mapping your artists against Sonic's music theory primitives. This is what the system would normally derive from behavioral timestamps — for this trial, Claude is doing it analytically.</p>
+
+    <div id="fingerprint-progress" class="thinking">
+      <div class="thinking-spinner"></div>
+      <span id="fingerprint-status">Analyzing your artists...</span>
+    </div>
+
+    <div id="fingerprint-result" class="hidden">
+      <div class="two-col" id="primitive-summary"></div>
+      <hr class="section-divider">
+      <div id="artist-annotations"></div>
+    </div>
+
+    <div class="btn-row hidden" id="fingerprint-continue">
+      <button class="btn btn-primary" data-action="runMatching">Find my matches →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       PHASE 4: MATCHING
+  ════════════════════════════════════════════════ -->
+  <div class="phase" id="phase-matching">
+    <div class="phase-label">Phase 03 — Discovery</div>
+    <h2>Your <em>matches</em></h2>
+    <p class="lede">Artists you've never heard of, ranked by music theory DNA alignment. The Tier 3 matches are the thesis — cross-genre connections that genre-based systems would never surface.</p>
+
+    <div id="matching-progress" class="thinking">
+      <div class="thinking-spinner"></div>
+      <span id="matching-status">Running the matching engine...</span>
+    </div>
+
+    <div id="matching-result" class="hidden">
+      <div id="tier3-header" style="margin-bottom: 20px;">
+        <div class="phase-label" style="margin-bottom: 4px;">Tier 3 — Cross-genre DNA</div>
+        <p style="font-size: 13px; color: #555;">These artists share no genre overlap with your profile. The connection is music theory primitives only.</p>
+      </div>
+      <div id="matches-container"></div>
+    </div>
+
+    <div class="btn-row hidden" id="matching-continue">
+      <button class="btn btn-primary" data-action="showResults">See full results →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       PHASE 5: RESULTS + VALIDATION
+  ════════════════════════════════════════════════ -->
+  <div class="phase" id="phase-results">
+    <div class="phase-label">Phase 04 — Validation</div>
+    <h2>Did the system <em>find you?</em></h2>
+    <p class="lede">For each match, listen to 30 seconds and rate whether it resonates. This is the core validity test — does the music theory fingerprint actually predict taste?</p>
+
+    <div id="results-container"></div>
+
+    <hr class="section-divider">
+
+    <div id="score-section" class="hidden">
+      <div class="phase-label">Validation score</div>
+      <div class="score-display" id="score-value">—</div>
+      <div class="score-label">of Tier 3 matches confirmed as resonant</div>
+      <div id="score-interpretation" style="margin-top: 16px; font-size: 14px; color: #444; line-height: 1.7;"></div>
+
+      <hr class="section-divider">
+      <div class="phase-label">Next: your dad</div>
+      <p style="font-size: 14px; color: #555; margin-bottom: 16px;">Run the same flow with his listening history to see if the system's cross-genre DNA logic holds for a musician's ear.</p>
+      <button class="btn btn-secondary" data-action="resetForDad">Start dad's trial →</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+window.onerror = function(msg, src, line, col, err) {
+  document.body.insertAdjacentHTML('afterbegin', '<div style="background:#fee;padding:12px;font-size:12px;font-family:monospace;position:fixed;top:0;left:0;right:0;z-index:9999;">' + msg + ' (line ' + line + ')</div>');
+  return false;
+};
+const STATE = {
+  clientId: '',
+  accessToken: '',
+  codeVerifier: '',
+  anthropicKey: '',
+  artists: [],
+  fingerprint: null,
+  matches: [],
+  feedback: {}
+};
+
+const SCOPE = 'user-top-read user-read-recently-played';
+
+function getRedirectUri() {
+  return window.location.href.split('?')[0].split('#')[0];
+}
+
+function showPhase(id) {
+  document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const phases = ['phase-setup','phase-callback','phase-manual','phase-fingerprint','phase-matching','phase-results'];
+  const idx = phases.indexOf(id);
+  document.getElementById('progress').style.width = ((idx / (phases.length - 1)) * 100) + '%';
+  window.scrollTo(0, 0);
+}
+
+function generateRandomString(length) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+  let result = '';
+  const array = new Uint8Array(length);
+  crypto.getRandomValues(array);
+  array.forEach(x => result += chars[x % chars.length]);
+  return result;
+}
+
+async function generateCodeChallenge(verifier) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(verifier);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return btoa(String.fromCharCode(...new Uint8Array(digest)))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+
+async function startSpotifyAuth() {
+  const clientId = document.getElementById('client-id').value.trim();
+  if (!clientId) { alert('Please enter your Client ID first.'); return; }
+  STATE.clientId = clientId;
+  STATE.anthropicKey = document.getElementById('anthropic-key').value.trim();
+  sessionStorage.setItem('anthropic_key', STATE.anthropicKey);
+
+  const verifier = generateRandomString(64);
+  STATE.codeVerifier = verifier;
+  const challenge = await generateCodeChallenge(verifier);
+
+  sessionStorage.setItem('pkce_verifier', verifier);
+  sessionStorage.setItem('spotify_client_id', clientId);
+
+  const redirectUri = getRedirectUri();
+  const params = new URLSearchParams({
+    client_id: clientId,
+    response_type: 'code',
+    redirect_uri: redirectUri,
+    scope: SCOPE,
+    code_challenge_method: 'S256',
+    code_challenge: challenge,
+    show_dialog: 'true'
+  });
+
+  window.location.href = 'https://accounts.spotify.com/authorize?' + params.toString();
+}
+
+async function handleCallback() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  const error = params.get('error');
+
+  if (error) {
+    showPhase('phase-setup');
+    document.getElementById('auth-error').textContent = 'Spotify authorization declined: ' + error;
+    document.getElementById('auth-error').classList.remove('hidden');
+    return;
+  }
+
+  if (!code) return;
+
+  showPhase('phase-callback');
+
+  const verifier = sessionStorage.getItem('pkce_verifier');
+  const clientId = sessionStorage.getItem('spotify_client_id');
+  const redirectUri = getRedirectUri();
+
+  if (!verifier || !clientId) {
+    showPhase('phase-setup');
+    return;
+  }
+
+  STATE.clientId = clientId;
+  STATE.anthropicKey = sessionStorage.getItem('anthropic_key') || '';
+
+  try {
+    const res = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        code: code,
+        redirect_uri: redirectUri,
+        client_id: clientId,
+        code_verifier: verifier
+      }).toString()
+    });
+
+    const data = await res.json();
+
+    if (data.access_token) {
+      STATE.accessToken = data.access_token;
+      sessionStorage.removeItem('pkce_verifier');
+      sessionStorage.removeItem('spotify_client_id');
+      history.replaceState({}, '', window.location.pathname);
+      await fetchSpotifyData();
+    } else {
+      showPhase('phase-setup');
+      document.getElementById('auth-error').textContent = 'Token exchange failed: ' + (data.error_description || data.error || 'Unknown error');
+      document.getElementById('auth-error').classList.remove('hidden');
+    }
+  } catch(e) {
+    showPhase('phase-setup');
+    document.getElementById('auth-error').textContent = 'Network error: ' + e.message;
+    document.getElementById('auth-error').classList.remove('hidden');
+  }
+}
+
+async function fetchSpotifyData() {
+  showPhase('phase-fingerprint');
+  document.getElementById('fingerprint-status').textContent = 'Fetching your Spotify data...';
+
+  try {
+    const headers = { 'Authorization': 'Bearer ' + STATE.accessToken };
+    const topArtists = await fetch('https://api.spotify.com/v1/me/top/artists?limit=20&time_range=medium_term', { headers }).then(r => r.json());
+    const artistNames = (topArtists.items || []).map(a => a.name);
+    STATE.artists = artistNames;
+    document.getElementById('fingerprint-status').textContent = 'Building fingerprint from ' + artistNames.length + ' artists...';
+    await buildFingerprint(artistNames);
+  } catch(e) {
+    document.getElementById('fingerprint-status').textContent = 'Error fetching Spotify data: ' + e.message;
+  }
+}
+
+function skipToManual() {
+  try { STATE.anthropicKey = document.getElementById('anthropic-key').value.trim(); } catch(e) {}
+  showPhase('phase-manual');
+}
+
+function switchTab(tab) {
+  document.getElementById('panel-artists').style.display = tab === 'artists' ? 'block' : 'none';
+  document.getElementById('panel-tracks').style.display = tab === 'tracks' ? 'block' : 'none';
+  document.getElementById('tab-artists').style.background = tab === 'artists' ? 'white' : 'var(--tag-bg)';
+  document.getElementById('tab-artists').style.color = tab === 'artists' ? 'var(--black)' : 'var(--warm-gray)';
+  document.getElementById('tab-tracks').style.background = tab === 'tracks' ? 'white' : 'var(--tag-bg)';
+  document.getElementById('tab-tracks').style.color = tab === 'tracks' ? 'var(--black)' : 'var(--warm-gray)';
+}
+
+function extractArtistsFromTrackList(raw) {
+  const lines = raw.split('\n').map(s => s.trim()).filter(Boolean);
+  const artists = new Set();
+  lines.forEach(line => {
+    const tabs = line.split('\t');
+    if (tabs.length >= 3) {
+      const artist = tabs[2].trim();
+      if (artist && artist.length > 1) artists.add(artist);
+      return;
+    }
+    const dashMatch = line.match(/^(.+?)\s[-–]\s/);
+    if (dashMatch) { artists.add(dashMatch[1].trim()); return; }
+  });
+  return [...artists];
+}
+
+function processInput() {
+  const manualKey = document.getElementById('anthropic-key-manual');
+  if (manualKey && manualKey.value.trim()) STATE.anthropicKey = manualKey.value.trim();
+  const isTrackTab = document.getElementById('panel-tracks') && document.getElementById('panel-tracks').style.display === 'block';
+  let artists = [];
+  if (isTrackTab) {
+    const raw = document.getElementById('track-list').value.trim();
+    if (!raw) { alert('Please paste a track list.'); return; }
+    artists = extractArtistsFromTrackList(raw);
+    if (artists.length < 3) artists = raw.split('\n').map(s => s.trim()).filter(Boolean);
+  } else {
+    const raw = document.getElementById('manual-artists').value.trim();
+    if (!raw) { alert('Please enter at least a few artists.'); return; }
+    artists = raw.split('\n').map(s => s.trim()).filter(Boolean);
+  }
+  if (artists.length < 3) { alert('Need at least 3 artists.'); return; }
+  artists = [...new Set(artists)];
+  STATE.artists = artists;
+  showPhase('phase-fingerprint');
+  buildFingerprint(artists);
+}
+
+function processManualArtists() { processInput(); }
+
+async function buildFingerprint(artists) {
+  document.getElementById('fingerprint-status').textContent = 'Annotating ' + artists.length + ' artists with music theory primitives...';
+  const prompt = `You are a music theorist and musicologist. Analyze these artists and build a precise taste fingerprint. Weight artists that appear multiple times more heavily — repetition signals genuine taste anchors, not casual listening.
+
+Artists (duplicates indicate stronger preference): ${artists.join(', ')}
+
+Return ONLY a JSON object (no markdown, no explanation) in this exact format:
+{
+  "dominantPrimitives": {
+    "harmonicMode": "the most common mode across these artists (e.g. minor, Dorian, major, Mixolydian, chromatic)",
+    "rhythmicFeel": "dominant rhythmic feel (e.g. swung, straight, polyrhythmic, sparse, driving)",
+    "tonalDensity": "overall density (sparse / medium / dense)",
+    "harmonicComplexity": "low / medium / high / jazz-extended",
+    "lyricDensity": "confessional / impressionistic / language-forward / texture-forward",
+    "voiceCharacter": "one phrase describing the voice type these artists share",
+    "distinctivenessIndex": "low / medium / high"
+  },
+  "frisson": {
+    "primaryType": "warm / cold / being-moved",
+    "trigger": "one sentence: what musical moment most likely triggers the response for this listener"
+  },
+  "annotatedArtists": [
+    { "name": "artist name", "mode": "harmonic mode", "feel": "rhythmic feel", "density": "sparse/medium/dense", "complexity": "low/medium/high", "lyric": "confessional/impressionistic/language-forward/texture-forward", "distinctive": "low/medium/high" }
+  ],
+  "profileSummary": "2 sentences max. What kind of listener is this? What do they actually respond to, beneath genre labels?"
+}`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': STATE.anthropicKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 2000, messages: [{ role: 'user', content: prompt }] })
+    });
+    const data = await response.json();
+    if (!data.content) throw new Error('API response: ' + JSON.stringify(data));
+    const text = data.content.map(i => i.text || '').join('');
+    const fp = JSON.parse(text.replace(/```json|```/g, '').trim());
+    STATE.fingerprint = fp;
+    renderFingerprint(fp);
+  } catch(e) {
+    document.getElementById('fingerprint-status').textContent = 'Error: ' + e.message;
+  }
+}
+
+function renderFingerprint(fp) {
+  document.getElementById('fingerprint-progress').classList.add('hidden');
+  document.getElementById('fingerprint-result').classList.remove('hidden');
+  document.getElementById('fingerprint-continue').classList.remove('hidden');
+  const dp = fp.dominantPrimitives;
+  const labels = { harmonicMode:'Harmonic mode', rhythmicFeel:'Rhythmic feel', tonalDensity:'Tonal density', harmonicComplexity:'Harmonic complexity', lyricDensity:'Lyric orientation', voiceCharacter:'Voice character', distinctivenessIndex:'Distinctiveness' };
+  document.getElementById('primitive-summary').innerHTML = Object.entries(dp).map(([k,v]) => `<div style="background:white;border:1px solid var(--border);border-radius:8px;padding:14px 16px;"><div style="font-size:11px;color:var(--warm-gray);font-family:'DM Mono',monospace;margin-bottom:4px;">${labels[k]||k}</div><div style="font-weight:500;font-size:14px;">${v}</div></div>`).join('');
+  document.getElementById('artist-annotations').innerHTML = `
+    <div style="background:var(--accent-light);border-radius:10px;padding:18px 20px;margin-bottom:20px;">
+      <div style="font-size:11px;color:var(--accent);font-family:'DM Mono',monospace;margin-bottom:6px;letter-spacing:0.08em;">PROFILE SUMMARY</div>
+      <p style="font-size:14px;color:#1a3a28;line-height:1.7;">${fp.profileSummary}</p>
+      <div style="margin-top:10px;font-size:12px;color:#2d5a3d;"><strong>Frisson type:</strong> ${fp.frisson.primaryType} — ${fp.frisson.trigger}</div>
+    </div>
+    <div style="font-size:12px;color:var(--warm-gray);font-family:'DM Mono',monospace;margin-bottom:12px;letter-spacing:0.06em;">ANNOTATED ARTISTS</div>
+    <div class="artist-grid">${fp.annotatedArtists.map(a => `<div class="artist-chip"><div class="artist-avatar">${a.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}</div><div><div class="artist-name">${a.name}</div><div class="artist-genre">${a.mode} · ${a.feel} · ${a.density}</div></div></div>`).join('')}</div>`;
+}
+
+async function runMatching() {
+  showPhase('phase-matching');
+  STATE.calibrationRound = 0;
+  STATE.calibrationHistory = [];
+  await runCalibrationRound();
+}
+
+async function identifyVarianceAxes(fp) {
+  const dp = fp.dominantPrimitives;
+  const artists = fp.annotatedArtists || [];
+  
+  // Find dimensions with highest variance across annotated artists
+  const dimensions = ['mode', 'feel', 'density', 'complexity', 'lyric', 'distinctive'];
+  const variance = {};
+  dimensions.forEach(dim => {
+    const vals = artists.map(a => a[dim]).filter(Boolean);
+    const unique = new Set(vals);
+    variance[dim] = unique.size;
+  });
+  
+  // Sort by variance descending — most uncertain dimensions first
+  return Object.entries(variance)
+    .sort((a,b) => b[1]-a[1])
+    .slice(0,3)
+    .map(([dim]) => dim);
+}
+
+async function runCalibrationRound() {
+  const round = STATE.calibrationRound;
+  const fp = STATE.fingerprint;
+  const dp = fp.dominantPrimitives;
+  
+  document.getElementById('matching-progress').classList.remove('hidden');
+  document.getElementById('matching-result').classList.add('hidden');
+  document.getElementById('matching-continue').classList.add('hidden');
+
+  // Determine what axis to probe this round
+  const axes = await identifyVarianceAxes(fp);
+  const roundConfigs = [
+    { label: 'experimental edge', instruction: `Push toward the most experimental/chromatic end of this listener's profile. Test how far the experimental edge goes before it stops resonating. Favor artists with high distinctiveness, chromatic or modal harmony, textural density.` },
+    { label: 'accessible edge', instruction: `Pull toward the more accessible/melodic end of this listener's profile. Test where "too pop" begins. Favor artists with cleaner harmonic language but retain the swung rhythmic feel and confessional lyric quality.` },
+    { label: `${axes[0]} variance`, instruction: `This listener shows high variance in ${axes[0]}. Surface artists that specifically test this dimension — some leaning one way, some the other — to determine which end actually resonates.` },
+    { label: 'cross-genre DNA only', instruction: `Ignore genre entirely. Match ONLY on music theory primitives. Surface artists from completely unexpected genres — country, jazz, electronic, classical-adjacent — that share the core harmonic/rhythmic DNA.` },
+    { label: 'ultra-obscure', instruction: `Surface only artists with debut releases or under 5k monthly listeners. Obscurity is the primary constraint this round. Quality of primitive match is secondary.` }
+  ];
+  
+  const config = roundConfigs[round % roundConfigs.length];
+  
+  // Build context from previous rounds
+  let calibrationContext = '';
+  if (STATE.calibrationHistory.length > 0) {
+    const hits = STATE.calibrationHistory.filter(r => r.resonated).map(r => r.name);
+    const misses = STATE.calibrationHistory.filter(r => !r.resonated).map(r => r.name);
+    calibrationContext = `
+
+PREVIOUS ROUND FEEDBACK:
+- Resonated: ${hits.join(', ') || 'none'}
+- Missed: ${misses.join(', ') || 'none'}
+Adjust recommendations based on this — move toward what resonated, away from what missed.`;
+  }
+
+  document.getElementById('matching-status').textContent = `Round ${round + 1} — probing ${config.label}...`;
+
+  const prompt = `You are a music discovery calibration engine running round ${round + 1} of 5.
+
+LISTENER FINGERPRINT:
+- Harmonic mode: ${dp.harmonicMode}
+- Rhythmic feel: ${dp.rhythmicFeel}  
+- Tonal density: ${dp.tonalDensity}
+- Harmonic complexity: ${dp.harmonicComplexity}
+- Lyric orientation: ${dp.lyricDensity}
+- Voice character: ${dp.voiceCharacter}
+- Distinctiveness: ${dp.distinctivenessIndex}
+- Frisson trigger: ${fp.frisson.trigger}
+- Profile: ${fp.profileSummary}
+
+ROUND FOCUS: ${config.instruction}
+${calibrationContext}
+
+Known artists to EXCLUDE: ${STATE.artists.join(', ')}
+
+HARD REQUIREMENTS:
+- Return exactly 4 artists
+- Every artist must be real and verifiable on Spotify
+- Prioritize artists under 100k monthly Spotify listeners
+- Do NOT suggest: dream pop, shoegaze, or soft indie as defaults
+- Each must have a specific music theory reason for the match — name the exact primitives
+
+Return ONLY a JSON array (no markdown, no preamble):
+[{
+  "name": "",
+  "genre": "",
+  "tier": "tier2 or tier3",
+  "spotifyPopularityEstimate": 0-100,
+  "primitives": {"mode":"","feel":"","density":"","lyric":"","distinctive":""},
+  "matchingPrimitives": ["2-3 shared primitives"],
+  "whyThisWorks": "2 sentences max. Exact primitive connection. No vague praise.",
+  "spotifySearchQuery": "",
+  "keyTrack": "",
+  "roundHypothesis": "one sentence: what this match tests about the listener's taste edge"
+}]`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': STATE.anthropicKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 2000, messages: [{ role: 'user', content: prompt }] })
+    });
+    const data = await response.json();
+    if (!data.content) throw new Error('API response: ' + JSON.stringify(data));
+    const text = data.content.map(i => i.text || '').join('');
+    let candidates = JSON.parse(text.replace(/```json|```/g, '').trim());
+    
+    // Spotify popularity verification
+    document.getElementById('matching-status').textContent = 'Verifying artist popularity on Spotify...';
+    candidates = await verifyArtistsOnSpotify(candidates);
+    
+    STATE.currentMatches = candidates;
+    renderCalibrationRound(candidates, round, config.label);
+  } catch(e) {
+    document.getElementById('matching-status').textContent = 'Error: ' + e.message;
+  }
+}
+
+async function verifyArtistsOnSpotify(candidates) {
+  if (!STATE.accessToken) return candidates;
+  
+  const verified = await Promise.all(candidates.map(async (artist) => {
+    try {
+      const res = await fetch(
+        `https://api.spotify.com/v1/search?q=${encodeURIComponent(artist.name)}&type=artist&limit=1`,
+        { headers: { 'Authorization': 'Bearer ' + STATE.accessToken } }
+      );
+      const data = await res.json();
+      const found = data.artists?.items?.[0];
+      if (found) {
+        return {
+          ...artist,
+          spotifyPopularity: found.popularity,
+          spotifyFollowers: found.followers?.total || 0,
+          spotifyId: found.id,
+          verified: true,
+          tooPopular: found.popularity > 55
+        };
+      }
+      return { ...artist, verified: false };
+    } catch(e) {
+      return { ...artist, verified: false };
+    }
+  }));
+  
+  return verified;
+}
+
+function renderCalibrationRound(matches, round, axisLabel) {
+  document.getElementById('matching-progress').classList.add('hidden');
+  document.getElementById('matching-result').classList.remove('hidden');
+
+  const roundLabels = ['Round 1 · Experimental edge', 'Round 2 · Accessible edge', 'Round 3 · Variance probe', 'Round 4 · Cross-genre DNA', 'Round 5 · Ultra-obscure'];
+  const label = roundLabels[round % roundLabels.length];
+
+  const container = document.getElementById('matches-container');
+  container.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+      <div>
+        <div style="font-size:11px;color:var(--warm-gray);font-family:'DM Mono',monospace;letter-spacing:0.08em;margin-bottom:3px;">${label}</div>
+        <div style="font-size:13px;color:#444;">Rate each to calibrate the next round.</div>
+      </div>
+      <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--warm-gray);">${round + 1} / 5</div>
+    </div>
+    ${matches.map((m, i) => `
+      <div class="match-card ${m.tier}" id="cal-card-${i}" style="margin-bottom:14px;">
+        <div class="match-header">
+          <div>
+            <div class="match-artist">${m.name}</div>
+            <div class="match-meta">${m.genre}${m.spotifyPopularity !== undefined ? ` · popularity: ${m.spotifyPopularity}/100${m.tooPopular ? ' ⚠ mainstream' : ''}` : ''}${m.spotifyFollowers ? ` · ${m.spotifyFollowers.toLocaleString()} followers` : ''}</div>
+          </div>
+          <div class="tier-badge">${m.tier === 'tier3' ? 'TIER 3' : 'TIER 2'}</div>
+        </div>
+        <div style="font-size:12px;color:var(--accent);font-family:'DM Mono',monospace;margin:8px 0 4px;font-style:italic;">${m.roundHypothesis || ''}</div>
+        <div class="match-explanation">${m.whyThisWorks}</div>
+        <div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <a href="https://open.spotify.com/search/${encodeURIComponent(m.spotifySearchQuery)}" target="_blank" class="btn btn-spotify" style="font-size:11px;padding:6px 12px;">Open in Spotify ↗</a>
+          <span style="font-size:12px;color:var(--warm-gray);">Try: <em>${m.keyTrack}</em></span>
+        </div>
+        <div style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px;">
+          <div class="feedback-box">
+            <button class="feedback-btn" id="cal-yes-${i}" data-action="calFeedback" data-idx="${i}" data-val="true">Resonates</button>
+            <button class="feedback-btn" id="cal-no-${i}" data-action="calFeedback" data-idx="${i}" data-val="false">Misses</button>
+            <button class="feedback-btn" id="cal-partial-${i}" data-action="calFeedback" data-idx="${i}" data-val="partial">Partially</button>
+          </div>
+        </div>
+      </div>
+    `).join('')}
+    <div id="round-continue" class="hidden" style="margin-top:16px;">
+      <div id="round-insight" style="background:var(--accent-light);border-radius:8px;padding:14px 16px;font-size:13px;color:#1a3a28;line-height:1.7;margin-bottom:16px;"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="next-round-btn" data-action="advanceCalibration">Next round →</button>
+        <button class="btn btn-secondary" data-action="showFinalResults">See all results</button>
+      </div>
+    </div>
+  `;
+  
+  STATE.roundFeedback = {};
+}
+
+function recordCalFeedback(idx, value) {
+  const m = STATE.currentMatches[idx];
+  STATE.roundFeedback[idx] = value;
+  STATE.calibrationHistory.push({ name: m.name, genre: m.genre, resonated: value === true || value === 'partial', value });
+  
+  ['yes','no','partial'].forEach(k => document.getElementById(`cal-${k}-${idx}`)?.classList.remove('selected-yes','selected-no'));
+  if (value === true) document.getElementById(`cal-yes-${idx}`)?.classList.add('selected-yes');
+  if (value === false) document.getElementById(`cal-no-${idx}`)?.classList.add('selected-no');
+  if (value === 'partial') document.getElementById(`cal-partial-${idx}`)?.classList.add('selected-yes');
+  
+  // Show continue once all rated
+  const total = STATE.currentMatches.length;
+  const rated = Object.keys(STATE.roundFeedback).length;
+  if (rated === total) {
+    const hits = Object.values(STATE.roundFeedback).filter(v => v === true || v === 'partial').length;
+    const insight = generateRoundInsight(STATE.currentMatches, STATE.roundFeedback, STATE.calibrationRound);
+    document.getElementById('round-insight').textContent = insight;
+    document.getElementById('round-continue').classList.remove('hidden');
+    if (STATE.calibrationRound >= 4) {
+      document.getElementById('next-round-btn').classList.add('hidden');
+    }
+  }
+}
+
+function generateRoundInsight(matches, feedback, round) {
+  const hits = matches.filter((m, i) => feedback[i] === true || feedback[i] === 'partial');
+  const misses = matches.filter((m, i) => feedback[i] === false);
+  
+  if (hits.length === 0) return `Nothing landed this round. The system is probing too far from your core — pulling back toward your anchor primitives next round.`;
+  if (misses.length === 0) return `Everything resonated. The fingerprint is well-calibrated on this axis. Next round goes further out.`;
+  
+  const hitGenres = hits.map(m => m.genre).join(', ');
+  const missGenres = misses.map(m => m.genre).join(', ');
+  return `Resonated: ${hits.map(m=>m.name).join(', ')} (${hitGenres}). Missed: ${misses.map(m=>m.name).join(', ')} (${missGenres}). Calibrating next round accordingly.`;
+}
+
+async function advanceCalibration() {
+  STATE.calibrationRound++;
+  await runCalibrationRound();
+}
+
+function showFinalResults() {
+  showPhase('phase-results');
+  
+  const allMatches = STATE.calibrationHistory;
+  const hits = allMatches.filter(m => m.resonated);
+  const misses = allMatches.filter(m => !m.resonated);
+  const pct = allMatches.length > 0 ? Math.round((hits.length / allMatches.length) * 100) : 0;
+  
+  document.getElementById('results-container').innerHTML = `
+    <div style="margin-bottom:24px;">
+      <div style="font-size:12px;color:var(--warm-gray);font-family:'DM Mono',monospace;margin-bottom:12px;letter-spacing:0.06em;">ALL ROUNDS — CALIBRATION HISTORY</div>
+      ${allMatches.map(m => `
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
+          <div style="width:8px;height:8px;border-radius:50%;background:${m.resonated ? 'var(--accent)' : '#c0392b'};flex-shrink:0;"></div>
+          <div style="flex:1;">
+            <span style="font-weight:500;font-size:14px;">${m.name}</span>
+            <span style="font-size:12px;color:var(--warm-gray);margin-left:8px;">${m.genre}</span>
+          </div>
+          <div style="font-size:11px;font-family:'DM Mono',monospace;color:${m.resonated ? 'var(--accent)' : '#c0392b'};">${m.value === 'partial' ? 'partial' : m.resonated ? 'yes' : 'no'}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  
+  document.getElementById('score-value').textContent = pct + '%';
+  document.getElementById('score-section').classList.remove('hidden');
+  
+  let interpretation = '';
+  if (pct >= 75) interpretation = 'Strong calibration. The fingerprint is finding genuine matches across genre lines. The music theory primitive layer is working — cross-genre DNA is predicting resonance.';
+  else if (pct >= 50) interpretation = 'Partial calibration. The fingerprint is directionally accurate but some dimensions are mis-weighted. The misses are the most useful data — what do they have in common?';
+  else interpretation = "The system is still learning your edges. Low accuracy across 5 rounds means the primitive weightings need adjustment. Review the miss patterns — they likely share a quality the fingerprint isn't capturing.";
+  
+  document.getElementById('score-interpretation').textContent = interpretation;
+}
+
+function showResults() { showFinalResults(); }
+
+function renderResultCard(m, tier, idx) { return ''; }
+function recordFeedback() {}
+function checkAndShowScore() {}
+function renderMatches() {}
+
+function resetForDad() {
+  STATE.artists=[]; STATE.fingerprint=null; STATE.matches=[]; STATE.feedback={};
+  STATE.calibrationRound=0; STATE.calibrationHistory=[]; STATE.currentMatches=[];
+  document.getElementById('manual-artists').value='';
+  showPhase('phase-manual');
+}
+
+// On load: check if we're returning from Spotify OAuth
+window.addEventListener('load', () => {
+  const redirectUri = getRedirectUri();
+  const uriDisplay = document.getElementById('redirect-uri-display');
+  if(uriDisplay) uriDisplay.textContent = redirectUri;
+
+  const params = new URLSearchParams(window.location.search);
+  if(params.get('code') || params.get('error')) {
+    handleCallback();
+  }
+});
+
+// Event delegation for all static buttons
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('[data-action]');
+  if (!btn) return;
+  const action = btn.getAttribute('data-action');
+  if (action === 'startSpotifyAuth') startSpotifyAuth();
+  else if (action === 'skipToManual') skipToManual();
+  else if (action === 'processInput') processInput();
+  else if (action === 'runMatching') runMatching();
+  else if (action === 'showResults') showResults();
+  else if (action === 'showFinalResults') showFinalResults();
+  else if (action === 'advanceCalibration') advanceCalibration();
+  else if (action === 'resetForDad') resetForDad();
+  else if (action === 'switchTab') switchTab(btn.getAttribute('data-tab'));
+  else if (action === 'showSetup') showPhase('phase-setup');
+  else if (action === 'calFeedback') {
+    const idx = parseInt(btn.getAttribute('data-idx'));
+    const val = btn.getAttribute('data-val');
+    recordCalFeedback(idx, val === 'true' ? true : val === 'false' ? false : val);
+  }
+});
+</script>
+</body>
+</html>
